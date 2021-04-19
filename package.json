@@ -1,5 +1,5 @@
 {
-  "name": "electro-typer",
+  "name": "mysql-electron-test",
   "version": "0.1.0",
   "private": true,
   "homepage": "./",
@@ -11,6 +11,7 @@
     "chokidar": "^3.5.1",
     "draft-js": "^0.11.7",
     "file-extension": "^4.0.5",
+    "mysql": "^2.18.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-draft-wysiwyg": "^1.14.5",
@@ -21,11 +22,12 @@
   },
   "main": "main.js",
   "scripts": {
-    "start": "BROWSER=none craco start",
+    "start": "cross-env BROWSER=none craco start",
+    "electron-start": "cross-env ELECTRON_START_URL=http://localhost:3000 electron .",
     "build": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject",
-    "electron": "electron .",
+    "electron": "cross-env electron .",
     "dev": "nf start"
   },
   "eslintConfig": {
@@ -49,6 +51,7 @@
   "devDependencies": {
     "@tailwindcss/postcss7-compat": "^2.1.0",
     "autoprefixer": "^9.8.6",
+    "cross-env": "^7.0.3",
     "electron": "^12.0.4",
     "foreman": "^3.0.1",
     "postcss": "^7.0.35",

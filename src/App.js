@@ -7,8 +7,11 @@ import { LIST_FILES_IN_DIRECTORY } from "./shared/constants";
 const {ipcRenderer} = window.require('electron');
 
 const defaultConfig = {
-  currentDir: localStorage.getItem('currentDir') || null,
-  files: [],
+  credentials: null,
+  isLoading: false, 
+  connected: false,
+  result: null,
+  lastQuery: '',
 }
 
 function App() {
@@ -16,15 +19,28 @@ function App() {
   const [configState, setconfigState] = useState(defaultConfig);
 
   useEffect(() => {
-    
-      if(configState.currentDir) {
-        console.log("SENDING");
-        ipcRenderer.send(LIST_FILES_IN_DIRECTORY, configState.currentDir);
+   ipcRenderer.on('DB_QUERY_RESULT', (event, data) => {
+     console.log({data});
+     if(!data.error) {
+       setconfigState({
+         ...configState, 
+         result: data.results, 
+         lastQuery: data.query,
+         error: null,
+       });
+     }
+   });
+    ipcRenderer.on('DB_CONNECTION_UPDATE', (event, data) =>{
+      console.log({data});
+      if(!data.error) {
+        document.title = `${document.title} (Connected to ${data.credentials.database})`;
+      } else {
+        window.alert(data.error);
       }
-    ipcRenderer.on(LIST_FILES_IN_DIRECTORY, (event, args) => {
-      document.title = 'Received data';
-      console.log({args});
-      setconfigState({...configState, files: args});
+      setconfigState({...configState, 
+        credentials: data.credentials,  
+        connected: !data.error,
+        isLoading: false});
     });
     return ()=>{
       ipcRenderer.removeAllListeners();

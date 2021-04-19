@@ -2,14 +2,54 @@
 const {app, BrowserWindow, ipcMain} = require('electron')
 const path = require('path')
 const url = require('url');
-const chokidar = require('chokidar');
-const { currentDir, getFilesInPath } = require('./electron-src/utils');
-const { LIST_FILES_IN_DIRECTORY } = require('./src/shared/constants');
+const mysql = require('mysql');
+let dbConnection = null; //initially
+let mainWindow; //initally
 
-let count = 0;
+function connectToDB({host, user, password, database}) {
+  host = 'sql6.freemysqlhosting.net';
+  user = 'sql6406627';
+  database = 'sql6406627';
+  password = 'PhzNKTikDC';
+  try {
+    dbConnection = mysql.createConnection({
+      host, user, password, database 
+    });
+    let error = null;
+    const getTablesQuery = `SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE';`;
+    dbConnection.query(getTablesQuery, function (error, results, fields) {
+      console.log({results});
+      if (error) throw error;
+      if(results) {
+        mainWindow.webContents.send('DB_QUERY_RESULT', {
+          query: getTablesQuery, 
+          error: error, 
+          results: results
+        });
+      }
+    });
+    dbConnection.connect((err) => {
+      if(err) {
+        // this means error
+        error = err;
+      }
+      
+      mainWindow.webContents.send('DB_CONNECTION_UPDATE', {
+        status: error ? "ERROR" : "CONNECTED",
+        error, 
+        credentials: {
+          host, user, database
+        }
+      });
+    })
+  } catch (error) {
+    console.error({error});
+  }
+}
+
 function createWindow () {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -30,17 +70,7 @@ mainWindow.loadURL(startUrl);
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
 
-  let watcher = chokidar.watch(currentDir, {
-    awaitWriteFinish: true, 
-    persistent: true, 
-    depth:1, 
-  }).on('add', (path)=>{
-    const fileList = getFilesInPath(currentDir);
-    mainWindow.webContents.send(LIST_FILES_IN_DIRECTORY, fileList);
-  }).on('unlink', (path) => {
-    const fileList = getFilesInPath(currentDir);
-    mainWindow.webContents.send(LIST_FILES_IN_DIRECTORY, fileList);
-  });
+  
 }
 
 // This method will be called when Electron has finished
@@ -69,3 +99,7 @@ app.on('window-all-closed', function () {
 // Adding event listeners from renderer 
 require('./electron-src/rendererEvents');
 
+ipcMain.on('SET_DB_CREDENTIALS', (event, data) => {
+  console.log({data});
+  connectToDB({host: data.host, user: data.username, password: data.password, database: data.dbname});
+});
