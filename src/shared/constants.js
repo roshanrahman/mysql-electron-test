@@ -1,0 +1,11 @@
+const LIST_FILES_IN_DIRECTORY = "LIST_FILES_IN_DIRECTORY";
+
+const ACCEPTABLE_FILE_EXTENSIONS = ['md', 'txt', 'js', 'java', 'html'];
+
+const REQUEST_HOME_DIR = "REQUEST_HOME_DIR";
+
+module.exports = {
+    LIST_FILES_IN_DIRECTORY,
+    ACCEPTABLE_FILE_EXTENSIONS,
+    REQUEST_HOME_DIR
+};
