@@ -3,14 +3,16 @@
 ## Install all dependencies
 
 ```npm install```
-# For quick demo, simply run 
+## For quick demo, simply run 
 ```npm run dev```
-# Run React
-```yarn start```
+
+## Or the long way:
+### Run React
+```npm start```
 
 This will start the React dev server
 
-# In other terminal, run Electron
+### In other terminal, run Electron
 
 ```npm run electron-start ```
 
