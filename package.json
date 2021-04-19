@@ -20,7 +20,7 @@
     "react-scripts": "4.0.3",
     "web-vitals": "^1.0.1"
   },
-  "main": "main.js",
+  "main": "public/electron.js",
   "scripts": {
     "start": "cross-env BROWSER=none craco start",
     "electron-start": "cross-env ELECTRON_START_URL=http://localhost:3000 electron .",
@@ -28,7 +28,10 @@
     "test": "craco test",
     "eject": "react-scripts eject",
     "electron": "cross-env electron .",
-    "dev": "nf start"
+    "dev": "nf start",
+    "postinstall": "electron-builder install-app-deps",
+    "preelectron-pack": "npm run build",
+    "electron-pack": "electron-builder"
   },
   "eslintConfig": {
     "extends": [
@@ -53,8 +56,25 @@
     "autoprefixer": "^9.8.6",
     "cross-env": "^7.0.3",
     "electron": "^12.0.4",
+    "electron-builder": "^22.10.5",
     "foreman": "^3.0.1",
     "postcss": "^7.0.35",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.1.0"
+  },
+  "author": {
+    "name": "Roshan",
+    "email": "roshanrahman6399@gmail.com",
+    "url": "https://google.com"
+  },
+  "build": {
+    "appId": "com.roshan.mysqlelectrontest",
+    "productName": "MySQL-Electron-Test",
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
   }
 }

@@ -5,7 +5,6 @@ const url = require('url');
 const mysql = require('mysql');
 let dbConnection = null; //initially
 let mainWindow; //initally
-const getTablesQuery = `SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE';`;
 
 function connectToDB({host, user, password, database}) {
   try {
@@ -25,13 +24,16 @@ function connectToDB({host, user, password, database}) {
           host, user, database
         }
       });
-      dbConnection.query(getTablesQuery, function (error, results, fields) {
+      const queryString = `SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE' AND TABLE_SCHEMA='${database}';`;
+      dbConnection.query(
+        queryString
+        , function (error, results, fields) {
         console.log({results});
         if (error) throw error;
         if(results) {
           mainWindow.webContents.send('DB_LIST_TABLES_QUERY_RESULT', {
             queryName: 'getTablesQuery',
-            query: getTablesQuery, 
+            query: queryString, 
             error: error, 
             results: results
           });
@@ -52,7 +54,8 @@ function createWindow () {
         nodeIntegration: true,
         contextIsolation: false,
     //   preload: path.join(__dirname, 'preload.js')
-    }
+    },
+    icon: path.join(__dirname, 'assets/icon.png')
   })
 
   // and load the index.html of the app.
@@ -91,7 +94,6 @@ app.on('window-all-closed', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-
 
 
 ipcMain.on('SET_DB_CREDENTIALS', (event, data) => {

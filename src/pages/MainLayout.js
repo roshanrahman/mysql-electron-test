@@ -4,6 +4,7 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import ConfigContext from '../context/ConfigContext';
 import { MdReplay } from 'react-icons/md';
 import { REQUEST_HOME_DIR } from '../shared/constants';
+import {getTableData} from  "../shared/constants";
 const {ipcRenderer} = window.require('electron');
 
 export default function MainLayout() {
@@ -15,19 +16,8 @@ export default function MainLayout() {
     const [portVal, setportVal] = useState('3306');
     const [hello, sethello] = useState('helloworld');
 
-    const isDisabled = () =>{
-        return Boolean(hostVal) && Boolean(dbnameVal) && Boolean(usernameVal) && Boolean(passwordVal) && Boolean(portVal);
-    }
+  
 
-
-    useEffect(()=>{
-        if(!configState.currentDir) {
-            ipcRenderer.invoke(REQUEST_HOME_DIR).then((value)=>{
-                localStorage.setItem('currentDir', value);
-                setConfigState({...configState, currentDir: value});
-            });
-        }
-    }, [configState]);
 
     return (
         <div className="flex h-screen">
@@ -45,6 +35,11 @@ export default function MainLayout() {
                     
                     <button 
                     disabled={!configState.credentials && configState.isLoading}
+                    onClick={
+                        ()=>{
+                            ipcRenderer.send('REFRESH_LIST_TABLES_QUERY');
+                        }
+                    }
                     className="
                     hover:text-red-700
                     hover:bg-red-100
@@ -59,7 +54,11 @@ export default function MainLayout() {
             </div>
             <div className="h-4"></div>
             <div className="flex flex-col p-2 space-y-1 mb-2">
-            <label htmlFor="host" className="text-xs opacity-80">Server/Host (<button className="opacity-100 underline">Localhost</button>)</label>
+            <label htmlFor="host" className="text-xs opacity-80">Server/Host (<button onClick={
+                ()=> {
+                    setHostVal('localhost');
+                }
+            } className="opacity-100 underline">Localhost</button>)</label>
             <input type="text" name="host" id="host" placeholder="Host"
             value={
                 hostVal
@@ -149,12 +148,49 @@ export default function MainLayout() {
             </div>
             
                 {/* RIGHT SIDE HEADER */}
-            <div className="h-full right flex-1">
+            {
+               !configState.isBlank ? <div className="flex flex-col  h-full w-full overflow-y-scroll right flex-1">
+                <div className="bg-gray-800 p-2 m-2 rounded self-stretch">
+                   {
+                       getTableData(configState.result).length > 0 ? <div className="">
+                           <span className="text-white opacity-50 text-xs">TABLES DETECTED</span>
+                  <ul className="text-white font-bold">
+                  {
+                      getTableData(configState.result).map((item) => <li>{item.tableName} <span className="font-normal">(with {item.tableRows} rows)</span></li>)
+                   }
+                  </ul>
+                       </div> : 
+                       <div className="">
+                           NO TABLES DETECTED
+                       </div>
+                   }
+                </div>
                 {
-                    configState.connected ? `Connected to ${configState.credentials}` : `Error occurred during connection`
+                    Object.entries(configState.tableColumns).map((entries) => {
+                    const tableName = entries[0];
+                    const columns = entries[1];
+                    return <div className="p-2 w-full max-w-sm border-gray-400 rounded border m-2">
+                        {tableName}
+                        <ul>
+                           { columns.map(column => {
+                                return <li>
+                                    <div className="li p-2 bg-gray-200 bg-opacity-25 rounded m-2 flex justify-between">
+                                        <span className="rounded bg-red-800 p-1 text-xs font-bold uppercase text-white">{column.columnType}</span>
+                                        <span>{column.columnName}</span>
+                                    </div>
+                                </li>
+                            })}
+                        </ul>
+                    </div>;
+                    })
                 }
-                {JSON.stringify(configState)}
-            </div>
+            </div> : (
+                <div className="bg-gray-200 h-full w-full flex items-center justify-center cursor-default">
+                    <span className="">Please connect to a database to view details
+                    </span>
+                </div>
+            )
+            }
         </div>
         )
 }
