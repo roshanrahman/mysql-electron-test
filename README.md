@@ -12,9 +12,11 @@ This will start the React dev server
 
 # In other terminal, run Electron
 
-```ELECTRON_START_URL=http://localhost:3000 electron . ```
+```npm run electron-start ```
 
-(Replace the URL with the URL where your React app is being served)
+This will start Electron
+
+(Replace the URL in `package.json` with the URL where your React app is being served)
 
 <!-- # Getting Started with Create React App
 
