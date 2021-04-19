@@ -7,10 +7,7 @@ let dbConnection = null; //initially
 let mainWindow; //initally
 
 function connectToDB({host, user, password, database}) {
-  host = 'sql6.freemysqlhosting.net';
-  user = 'sql6406627';
-  database = 'sql6406627';
-  password = 'PhzNKTikDC';
+  
   try {
     dbConnection = mysql.createConnection({
       host, user, password, database 
