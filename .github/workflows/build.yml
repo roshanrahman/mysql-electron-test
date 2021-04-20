@@ -21,7 +21,12 @@ jobs:
 
       - run: npm install 
       - name: Electron Build
-        run: npm run electron-pack -c.snap.publish=github
+        uses: knicknic/os-specific-run@v1.0.3
+        with:
+          macos: npm run electron-pack
+          linux: npm run electron-pack -c.snap.publish=github
+          windows: npm run electron-pack
+          github_token: ${{ secrets.github_token }
         env:
             # GitHub token, automatically provided to the action
             # (No need to define this secret in the repo settings)
