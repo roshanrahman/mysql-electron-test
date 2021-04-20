@@ -1,5 +1,6 @@
 {
   "name": "mysql-electron-test",
+  "description": "An app built with Electron.JS that can connect to MySQL databases",
   "version": "0.1.1",
   "private": true,
   "homepage": "./",
