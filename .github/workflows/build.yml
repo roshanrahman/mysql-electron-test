@@ -20,7 +20,8 @@ jobs:
           node-version: 14
 
       - run: npm install 
-      - run: npm run electron-pack -c.snap.publish=github
+      - name: Electron Build
+        run: npm run electron-pack -c.snap.publish=github
         with:
             # GitHub token, automatically provided to the action
             # (No need to define this secret in the repo settings)
