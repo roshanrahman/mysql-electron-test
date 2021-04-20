@@ -20,5 +20,5 @@ jobs:
           node-version: 14
 
       - run: npm install 
-      - run: npm run cross-env CI= build 
+      - run: npm run build 
       - run: npm run electron-pack
