@@ -5,6 +5,7 @@ const url = require('url');
 const mysql = require('mysql');
 let dbConnection = null; //initially
 let mainWindow; //initally
+let credentials;
 
 function connectToDB({host, user, password, database}) {
   try {
@@ -99,10 +100,12 @@ app.on('window-all-closed', function () {
 ipcMain.on('SET_DB_CREDENTIALS', (event, data) => {
   console.log({data});
   connectToDB({host: data.host, user: data.username, password: data.password, database: data.dbname});
+  credentials = {host: data.host, user: data.username, password: data.password, database: data.dbname};
 });
 
 ipcMain.on('REFRESH_LIST_TABLES_QUERY', (event, data) => {
   if(dbConnection) {
+    const getTablesQuery = `SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE' AND TABLE_SCHEMA='${credentials.database}';`;
     dbConnection.query(getTablesQuery, function (error, results, fields) {
       console.log({results});
       if (error) throw error;
