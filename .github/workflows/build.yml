@@ -42,7 +42,15 @@ jobs:
           macos: npm run electron-pack
           linux: npm run electron-pack -c.snap.publish=github
           windows: npm run electron-pack
-          github_token: ${{ secrets.github_token }}
+        env:
+            # GitHub token, automatically provided to the action
+            # (No need to define this secret in the repo settings)
+            GITHUB_TOKEN: ${{ secrets.github_token }}
+            GH_TOKEN: ${{ secrets.github_token }}
+
+            # If the commit is tagged with a version (e.g. "v1.0.0"),
+            # release the app after building
+            RELEASE: ${{ startsWith(github.ref, 'refs/tags/v') }}
       - name: Zipping files
         uses: papeloto/action-zip@v1
         with:
@@ -59,6 +67,7 @@ jobs:
             # GitHub token, automatically provided to the action
             # (No need to define this secret in the repo settings)
             GITHUB_TOKEN: ${{ secrets.github_token }}
+            GH_TOKEN: ${{ secrets.github_token }}
 
             # If the commit is tagged with a version (e.g. "v1.0.0"),
             # release the app after building
